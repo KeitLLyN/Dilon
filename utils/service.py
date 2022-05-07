@@ -30,8 +30,28 @@ def batch_generator(inputs, lengths, num_epochs, batch_size, vocab):
         while i + batch_size <= input_size:
             length = lengths[i:i + batch_size]
             padded = batch_padding(inputs[i:i + batch_size], length, vocab)
+            yield padded, length
+            i += batch_size
+        i = 0
 
 
 def batch_padding(inputs, lengths, vocab):
     max_length = max(lengths)
     return [sample + ([vocab.vocab['<PAD>']] * (max_length - len(sample))) for sample in inputs]
+
+
+def one_by_one_generator(inputs, lengths):
+    """
+    data to it length
+    """
+    for i in range(len(inputs)):
+        yield [inputs[i]], lengths[i]
+
+
+def print_progress(step, epoch, loss, step_loss, time):
+    """
+    Prints learning stage progress.
+    """
+    msg = "Step {} (epoch {}), average_train_loss = {:.5f}, step_loss = {:.5f}, time_per_step = {:.3f}"
+    msg = msg.format(step, epoch, loss, step_loss, time)
+    print(msg)
